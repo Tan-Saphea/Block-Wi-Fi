@@ -1,93 +1,88 @@
-# Block Wi-Fi on Windows (វិធីសាស្រ្តបិទ Wi-Fi លើ Windows)
+# Block Wi-Fi on Windows
 
-ឯកសារណែនាំស្តីពីរបៀបកំណត់មិនឱ្យកុំព្យូទ័រ Windows 10 ឬ Windows 11 អាចភ្ជាប់បណ្តាញ Wi-Fi បាន ទោះបីជាអ្នកប្រើប្រាស់ស្គាល់ Password ក៏ដោយ។
-
----
-
-## វិធីទី 1: បិទ Wi-Fi Adapter (ងាយស្រួល)
-
-វិធីនេះធ្វើឱ្យកុំព្យូទ័រមិនអាចភ្ជាប់ Wi-Fi បាន រហូតដល់មានអ្នកបើក Adapter ឡើងវិញ។
-
-### ជំហានអនុវត្ត:
-1. ចុច `Win + R` ដើម្បីបើកផ្ទាំង Run
-2. វាយបញ្ចូលពាក្យ `ncpa.cpl` រួចចុច **Enter**
-3. ស្វែងរក **Wi-Fi** Adapter
-4. ចុច Mouse ស្តាំ (Right-click) លើ **Wi-Fi**
-5. ជ្រើសរើសយក **Disable**
-
-> **ចំណាំ:** អ្នកប្រើប្រាស់ដែលមានសិទ្ធិជា Administrator អាចបើក (Enable) វាឡើងវិញបានយ៉ាងងាយស្រួល ដូច្នេះវិធីនេះមិនមែនជាការការពារដាច់ខាតឡើយ។
+A comprehensive guide on preventing Windows 10 and Windows 11 computers from connecting to Wi-Fi networks, even when users have the correct Wi-Fi password.
 
 ---
 
-## វិធីទី 2: Block Wi-Fi ទាំងអស់ដោយ CMD (ណែនាំ)
+## Overview
 
-វិធីនេះអាចរារាំងការភ្ជាប់ Wi-Fi បានយ៉ាងមានប្រសិទ្ធភាព ទោះបីជាស្គាល់ Password ក៏ដោយ។
+In shared, public, or enterprise environments, you may need to restrict Wi-Fi access completely while allowing wired Ethernet connections or completely blocking internet connectivity. This guide provides three distinct methods ranging from quick GUI toggles to robust command-line filtering and user account permission lockdowns.
 
-### ជំហានអនុវត្ត:
-1. បើក **Command Prompt** ដោយជ្រើសរើស **Run as administrator**
-2. វាយ Command ខាងក្រោមដើម្បីទប់ស្កាត់ការភ្ជាប់ Wi-Fi ប្រភេទ Infrastructure ទាំងអស់:
+---
+
+## Method 1: Disable the Wi-Fi Adapter (Quick & Simple)
+
+This method turns off the wireless network interface until it is manually re-enabled.
+
+### Steps:
+1. Press `Win + R` to open the **Run** dialog.
+2. Type `ncpa.cpl` and press **Enter** (opens Network Connections).
+3. Locate the **Wi-Fi** adapter.
+4. Right-click the **Wi-Fi** adapter and select **Disable**.
+
+> **Note:** Any user with administrative privileges can re-enable the adapter by right-clicking and selecting **Enable**. This method is not a tamper-proof restriction on its own.
+
+---
+
+## Method 2: Block All Wi-Fi Networks via Command Prompt (Recommended)
+
+This method adds a system-level filter that prevents Windows from detecting or connecting to infrastructure Wi-Fi networks, even if the password is known.
+
+### Steps:
+
+1. **Open Command Prompt as Administrator**:
+   - Press the Windows Key, type `cmd`.
+   - Right-click **Command Prompt** and select **Run as administrator**.
+
+2. **Add a Deny-All Filter**:
+   Run the following command to block all infrastructure Wi-Fi networks:
    ```cmd
    netsh wlan add filter permission=denyall networktype=infrastructure
    ```
-3. ផ្តាច់ Wi-Fi ដែលកំពុងភ្ជាប់បច្ចុប្បន្ន:
+
+3. **Disconnect Any Active Wi-Fi Connection**:
    ```cmd
    netsh wlan disconnect
    ```
-4. ពិនិត្យបញ្ជី Filter ដែលបានកំណត់:
+
+4. **Verify Active Filters**:
+   Confirm that the filter has been applied:
    ```cmd
    netsh wlan show filters
    ```
+   *You should see `infrastructure: Block all` listed under the active filters.*
 
-### របៀបបើកឱ្យភ្ជាប់ Wi-Fi វិញ (Restore Wi-Fi):
-នៅពេលអ្នកចង់អនុញ្ញាតឱ្យកុំព្យូទ័រភ្ជាប់ Wi-Fi វិញ សូមបើក Command Prompt (Run as administrator) រួចវាយ:
+### How to Unblock / Restore Wi-Fi Access:
+When you wish to restore wireless connectivity, open Command Prompt as Administrator and run:
 ```cmd
 netsh wlan delete filter permission=denyall networktype=infrastructure
 ```
 
 ---
 
-## វិធីទី 3: ការពារមិនឱ្យអ្នកផ្សេងបើក Wi-Fi វិញ
+## Method 3: Prevent Standard Users from Re-enabling Wi-Fi (Security Hardening)
 
-ប្រសិនបើកុំព្យូទ័រនេះមានអ្នកផ្សេងប្រើប្រាស់រួមគ្នា អ្នកគួរអនុវត្តបន្ថែមដូចខាងក្រោម:
-1. បង្កើត Windows Administrator Account ដែលមាន Password ការពារត្រឹមត្រូវ។
-2. ប្តូរ Account របស់អ្នកប្រើប្រាស់ផ្សេងឱ្យទៅជា **Standard User**។
-3. អនុវត្តការបិទ Wi-Fi Adapter តាមវិធីទី 1 ឬ Block តាមរយៈ CMD តាមវិធីទី 2។
-4. កុំចែករំលែក Administrator Password ទៅកាន់អ្នកប្រើប្រាស់ផ្សេង។
+If the computer is shared with other users, combine either Method 1 or Method 2 with account permission restrictions to prevent tampering:
 
-វិធីនេះនឹងធានាថាអ្នកប្រើប្រាស់ធម្មតាមិនអាចចូលទៅ Enable Adapter ឬកែសម្រួលការកំណត់របស់ Network ឡើងវិញបានឡើយ។
+1. **Create a Dedicated Administrator Account**:
+   - Ensure your account has a strong Administrator password.
+2. **Convert Other Accounts to Standard User**:
+   - Go to **Settings** > **Accounts** > **Other users**.
+   - Change the account type of all other users from **Administrator** to **Standard User**.
+3. **Keep the Administrator Password Confidential**:
+   - Standard users cannot run Command Prompt as Administrator or change adapter settings without entering the administrator password.
+4. **Apply the Restrictions**:
+   - Use Method 2 (WLAN filter) or Method 1 (Disable adapter) under your Administrator account.
 
 ---
 
-## English Guide
+## Compatibility
 
-### Method 1: Disable Wi-Fi Adapter
-1. Press `Win + R`, type `ncpa.cpl`, and press **Enter**.
-2. Locate the **Wi-Fi** adapter.
-3. Right-click on it and select **Disable**.
-*Note: Users with Administrator access can easily re-enable it.*
+- Windows 10 (Home, Pro, Enterprise, Education)
+- Windows 11 (Home, Pro, Enterprise, Education)
 
-### Method 2: Block All Wi-Fi Networks via Command Prompt (Recommended)
-1. Open **Command Prompt** as Administrator (**Run as administrator**).
-2. Block all infrastructure Wi-Fi networks:
-   ```cmd
-   netsh wlan add filter permission=denyall networktype=infrastructure
-   ```
-3. Disconnect any currently connected Wi-Fi:
-   ```cmd
-   netsh wlan disconnect
-   ```
-4. Verify the active filter:
-   ```cmd
-   netsh wlan show filters
-   ```
+---
 
-#### To Unblock / Restore Wi-Fi:
-Run Command Prompt as Administrator and execute:
-```cmd
-netsh wlan delete filter permission=denyall networktype=infrastructure
-```
+## License
 
-### Method 3: Restrict User Privileges
-1. Set up a secure password on your Administrator account.
-2. Change other user accounts to **Standard User**.
-3. Do not share the Administrator credentials. Standard users will not have permission to modify network filters or adapter states.
+This project is licensed under the MIT License.
